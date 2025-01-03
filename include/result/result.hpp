@@ -6,10 +6,10 @@ namespace extl {
 	concept is_result = std::derived_from<T, result_base>;
 
 	template <typename T, typename E>
-	struct result {
+	struct result : public result_base {
 	};
 
 	template <typename E>
-	struct result<void, E> {
+	struct result<void, E> : public result_base {
 	};
 }

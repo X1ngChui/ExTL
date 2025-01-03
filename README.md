@@ -6,7 +6,7 @@ ExTL is a specialized C++ template library designed specifically for environment
 
 - **No-Exception Design**: ExTL assumes a no-exception environment, meaning that all critical operations are expected to be `noexcept`.
 - `result<T, E>`: A versatile type for representing either a value of type `T` or an error of type `E`. This enables expressive, type-safe error handling without relying on exceptions.
-- **Lifecycle Function Assumptions**: ExTL assumes that lifecycle-related operations such as construction, destruction, move, and copy are guaranteed to succeed. For operations where construction or copying might fail, explicit alternatives like `T::create(...) -> result<T, E>` and `T::copy(const T&) -> result<T, E>` should be used. Violating these assumptions results in undefined behavior.
+- **Lifecycle Function Assumptions**: ExTL assumes that lifecycle-related operations such as construction, destruction, move, and copy are guaranteed to succeed. For operations where construction or copying might fail, explicit alternatives like `T::create(...)` and `T::copy(const T&)` should be used. Violating these assumptions results in undefined behavior.
 
 ## Design Philosophy
 
@@ -22,8 +22,10 @@ ExTL is built on the premise that exceptions, while powerful, may not be suitabl
 
    - For operations that may fail during construction or copying, ExTL provides explicit alternatives:
      - Use `T::create(...) -> result<T, E>` for constructing objects.
+     - Use `T::create(storage<T>&, ...) -> status<E>` for constructing objects in pre-allocated memory.
      - Use `T::copy(const T&) -> result<T, E>` for copying objects.
-   - These methods return `result<T, E>` to indicate success or failure explicitly.
+     - Use `T::copy(storage<T>&, const T&) -> status<E>` for copying objects to pre-allocated memory.
+   - These methods return `result<T, E>` or `status<E>` to indicate success or failure explicitly.
 
 3. **Guaranteed Move and Destruction**:
 
