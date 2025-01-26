@@ -22,12 +22,14 @@ endif()
 option(EXTL_DISABLE_EXCEPTIONS_AND_RTTI "Disable exceptions and RTTI" OFF)
 # Note: The EXTL_BUILD_TESTS option controls whether the tests are built.
 option(EXTL_BUILD_TESTS "Build tests" ON)
+# Note: The EXTL_STRICT_CONSTRAINTS option controls whether strict noexcept constraints are enabled in ExTL.
+option(EXTL_STRICT_CONSTRAINTS "Enable strict noexcept constraints in ExTL" OFF)
 
 # ---------------------------------------------------------------------------------------
 # Create the ExTL library target
 # ---------------------------------------------------------------------------------------
 add_library(ExTL INTERFACE)
-target_include_directories(ExTL INTERFACE ${CMAKE_SOURCE_DIR}/include)
+target_include_directories(ExTL INTERFACE ${CMAKE_SOURCE_DIR}/ExTL/include)
 
 # Disable exceptions and RTTI if EXTL_DISABLE_EXCEPTIONS is ON
 # Compiler flags to disable exceptions and RTTI
@@ -44,4 +46,10 @@ endif()
 if(EXTL_BUILD_TESTS)
     # Include the test directory and its CMakeLists.txt
     add_subdirectory(test)
+endif()
+
+if(EXTL_STRICT_CONSTRAINTS)
+    target_compile_definitions(ExTL INTERFACE EXTL_STRICT_CONSTRAINTS=1)
+else()
+    target_compile_definitions(ExTL INTERFACE EXTL_STRICT_CONSTRAINTS=0)
 endif()

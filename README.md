@@ -18,4 +18,4 @@ Contributions to ExTL are welcome! If you find bugs or have feature suggestions,
 
 ## License
 
-ExTL is licensed under the Apache License 2.0. See the [LICENSE](LICENSE) file for details.
+ExTL is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
