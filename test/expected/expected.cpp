@@ -7,7 +7,7 @@ namespace extest {
     using namespace extl;
     using extl::unexpected;
 
-    TEST_SUITE("expected") {
+    TEST_SUITE("expected<T, E>") {
         TEST_CASE("default constructor") {
             expected<int, char> e;
             CHECK(e.has_value());
@@ -220,6 +220,130 @@ namespace extest {
             CHECK(result.has_value());
             CHECK_EQ(result.value(), 42);
             expected<int, char> failure(unexpected('a'));
+            auto g = [](char error) noexcept { return error; };
+            auto result2 = failure.transform_error(g);
+            CHECK_FALSE(result2.has_value());
+            CHECK_EQ(result2.error(), 'a');
+        }
+    }
+
+    TEST_SUITE("expected<void, E>") {
+        TEST_CASE("default constructor") {
+            expected<void, char> e;
+            CHECK(e.has_value());
+        }
+
+        TEST_CASE("copy constructor with an unexpected value") {
+            expected<void, char> src(unexpected('a'));
+            expected<void, char> dest(src);
+            CHECK_FALSE(dest.has_value());
+            CHECK_EQ(dest.error(), 'a');
+        }
+
+        TEST_CASE("move constructor with an unexpected value") {
+            expected<void, char> src(unexpected('a'));
+            expected<void, char> dest(std::move(src));
+            CHECK_FALSE(dest.has_value());
+            CHECK_EQ(dest.error(), 'a');
+        }
+
+        TEST_CASE("copy constructor with an unexpected value from a different type") {
+            expected<void, char> src(unexpected('a'));
+            expected<void, unsigned char> dest(src);
+            CHECK_FALSE(dest.has_value());
+            CHECK_EQ(dest.error(), 'a');
+        }
+
+        TEST_CASE("move constructor with an unexpected value from a different type") {
+            expected<void, char> src(unexpected('a'));
+            expected<void, unsigned char> dest(std::move(src));
+            CHECK_FALSE(dest.has_value());
+            CHECK_EQ(dest.error(), 'a');
+        }
+
+        TEST_CASE("constructor with an unexpected value") {
+            expected<void, char> e(unexpected('a'));
+            CHECK_FALSE(e.has_value());
+            CHECK_EQ(e.error(), 'a');
+        }
+
+        TEST_CASE("constructor with an unexpected value from a different type") {
+            expected<void, unsigned char> e(unexpected('a'));
+            CHECK_FALSE(e.has_value());
+            CHECK_EQ(e.error(), 'a');
+        }
+
+        TEST_CASE("constructor with an unexpected value in place") {
+            expected<void, char> e(unexpect, 'a');
+            CHECK_FALSE(e.has_value());
+            CHECK_EQ(e.error(), 'a');
+        }
+
+        TEST_CASE("operator bool") {
+            expected<void, char> e;
+            CHECK(e);
+        }
+
+        TEST_CASE("observers") {
+            expected<void, char> success;
+            CHECK(success.has_value());
+            CHECK(success);
+            expected<void, char> failure(unexpected('a'));
+            CHECK_FALSE(failure.has_value());
+            CHECK_EQ(failure.error(), 'a');
+            CHECK_FALSE(failure);
+        }
+
+        TEST_CASE("observers with default value") {
+            expected<void, char> success;
+            CHECK_EQ(success.error_or('b'), 'b');
+            expected<void, char> failure(unexpected('a'));
+            CHECK_EQ(failure.error_or('b'), 'a');
+        }
+
+        TEST_CASE("and then") {
+            expected<void, char> success;
+            auto f = []() noexcept { return expected<void, char>(); };
+            auto result = success.and_then(f);
+            CHECK(result.has_value());
+            expected<void, char> failure(unexpected('a'));
+            auto g = []() noexcept { return expected<void, char>(); };
+            auto result2 = failure.and_then(g);
+            CHECK_FALSE(result2.has_value());
+            CHECK_EQ(result2.error(), 'a');
+        }
+
+        TEST_CASE("or else") {
+            expected<void, char> success;
+            auto f = [](char error) noexcept { return expected<void, char>(unexpected(error)); };
+            auto result = success.or_else(f);
+            CHECK(result.has_value());
+            expected<void, char> failure(unexpected('a'));
+            auto g = [](char error) noexcept { return expected<void, char>(unexpected(error)); };
+            auto result2 = failure.or_else(g);
+            CHECK_FALSE(result2.has_value());
+            CHECK_EQ(result2.error(), 'a');
+        }
+
+        TEST_CASE("transform") {
+            expected<void, char> success;
+            auto f = []() noexcept { return 42; };
+            auto result = success.transform(f);
+            CHECK(result.has_value());
+            CHECK_EQ(result.value(), 42);
+            expected<void, char> failure(unexpected('a'));
+            auto g = []() noexcept { return 42; };
+            auto result2 = failure.transform(g);
+            CHECK_FALSE(result2.has_value());
+            CHECK_EQ(result2.error(), 'a');
+        }
+
+        TEST_CASE("transform error") {
+            expected<void, char> success;
+            auto f = [](char error) noexcept { return error; };
+            auto result = success.transform_error(f);
+            CHECK(result.has_value());
+            expected<void, char> failure(unexpected('a'));
             auto g = [](char error) noexcept { return error; };
             auto result2 = failure.transform_error(g);
             CHECK_FALSE(result2.has_value());
