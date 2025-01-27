@@ -23,7 +23,7 @@ option(EXTL_DISABLE_EXCEPTIONS_AND_RTTI "Disable exceptions and RTTI" OFF)
 # Note: The EXTL_BUILD_TESTS option controls whether the tests are built.
 option(EXTL_BUILD_TESTS "Build tests" ON)
 # Note: The EXTL_STRICT_CONSTRAINTS option controls whether strict noexcept constraints are enabled in ExTL.
-option(EXTL_STRICT_CONSTRAINTS "Enable strict noexcept constraints in ExTL" OFF)
+option(EXTL_STRICT_CONSTRAINTS "Enable strict noexcept constraints in ExTL" ON)
 
 # ---------------------------------------------------------------------------------------
 # Create the ExTL library target
